@@ -45,8 +45,7 @@ function mostrarMenu() {
             buscarHabitacion(mostrarMenu)
             break
         case "4":
-            console.log("Cambiar estado")
-            mostrarMenu()
+            cambiarEstado(mostrarMenu)
             break
         case "5":
             console.log("Eliminar")
@@ -234,6 +233,94 @@ function buscarHabitacion(callback) {
         formatoHabitacion(habitacion)
         mostrarMenu()
     }, 2000)
+}
+
+function cambiarEstado(callback) {
+    console.log("Cambiar estado de una habitación...")
+    let numero = prompt("Ingresa el número de habitación a cambiar su estado").trim()
+
+    if (!validarNumero(numero) || parseInt(numero) <= 0) {
+        console.log("Número no valido...")
+        mostrarMenu()
+        return
+    }
+
+    console.log("Consultando base de datos del hotel...")
+
+    setTimeout(() => {
+
+        let modificado = false
+
+
+        const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
+
+        if (!habitacion) {
+            console.log("Habitación no encontrada...")
+            mostrarMenu()
+            return
+        }
+
+        formatoHabitacion(habitacion)
+
+        const estados = ["Libre", "Ocupada", "Limpieza"]
+
+        let menu = "======== Cambiar estado de la habitación ========\n\n" +
+            "1. Libre\n" +
+            "2. Ocupada\n" +
+            "3. Limpieza\n" +
+            "Ingresa el nuevo estado de la habitación:"
+
+        let seleccion = prompt(menu).trim()
+
+
+
+        switch (seleccion) {
+            case "1":
+                habitacion.estado = estados[0]
+                habitacion.huesped = "Vacío"
+                modificado = true
+                break
+            case "2":
+                habitacion.estado = estados[1]
+                let huesped = prompt("Nombre del huésped").trim()
+
+                if (huesped === "") {
+                    console.log("Nombre no valido...")
+                } else {
+                    habitacion.huesped = huesped
+                    modificado = true
+                }
+                break
+            case "3":
+                habitacion.estado = estados[2]
+                let huespedL = prompt("Nombre del huésped").trim()
+
+                if (huespedL === "") {
+                    console.log("Nombre no valido...")
+                } else {
+                    habitacion.huesped = huespedL
+                    modificado = true
+                }
+                break
+            default:
+                console.log("Selección no valida...")
+        }
+
+        if (modificado) {
+            console.log("Actualizando base de datos del hotel...")
+
+            setTimeout(() => {
+                console.log("Estado de la habitación actualizado exitosamente...")
+                formatoHabitacion(habitacion)
+                callback()
+            }, 2000)
+        } else {
+            console.log("No se realizaron cambios...")
+            callback()
+        }
+    }, 3000)
+
+
 }
 
 mostrarMenu()
