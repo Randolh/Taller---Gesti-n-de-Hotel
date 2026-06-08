@@ -48,8 +48,7 @@ function mostrarMenu() {
             cambiarEstado(mostrarMenu)
             break
         case "5":
-            console.log("Eliminar")
-            mostrarMenu()
+            eliminarHabitacion(mostrarMenu)
             break
         case "6":
             console.log("Saliendo...")
@@ -321,6 +320,32 @@ function cambiarEstado(callback) {
     }, 3000)
 
 
+}
+
+
+function eliminarHabitacion(callback) {
+    console.log("Eliminar habitación...")
+    let numero = prompt("Ingresa el número de habitación a eliminar").trim()
+
+    if (!validarNumero(numero) || parseInt(numero) <= 0) {
+        console.log("Número no valido...")
+        mostrarMenu()
+        return
+    }
+
+    console.log("Consultando base de datos del hotel...")
+
+    const index = habitaciones.findIndex(h => h.numero === parseInt(numero))
+
+    if (index === -1) {
+        console.log("Habitación no encontrada...")
+        mostrarMenu()
+        return
+    }
+
+    habitaciones.splice(index, 1)
+    console.log("Habitación eliminada exitosamente...")
+    mostrarMenu()
 }
 
 mostrarMenu()
