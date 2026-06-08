@@ -43,7 +43,7 @@ function mostrarMenu() {
 
 
 function validarNumero(valor) {
-  return valor.trim() !== '' && isFinite(valor)
+    return valor.trim() !== '' && isFinite(valor)
 }
 
 function formatoHabitacion(habitacion) {
@@ -57,8 +57,8 @@ function registrarHabitacion(callback) {
         numero: "",
         tipo: "",
         precioNoche: 0,
-        estado: "Libre",
-        huesped: "Vacío"
+        estado: "",
+        huesped: ""
     }
 
     while (true) {
@@ -110,6 +110,47 @@ function registrarHabitacion(callback) {
                 console.log("Precio no valido...")
             } else {
                 habitacion.precioNoche = parseFloat(precio)
+            }
+
+            continue
+        }
+
+        if (habitacion.estado === "") {
+            const estados = ["Libre", "Ocupada", "Limpieza"]
+
+            let menu = "======== Estado de la habitación ========\n\n" +
+                "1. Libre\n" +
+                "2. Ocupada\n" +
+                "3. Limpieza\n" +
+                "Ingresa el estado de la habitación:"
+
+            let seleccion = prompt(menu).trim()
+
+            switch (seleccion) {
+                case "1":
+                    habitacion.estado = estados[0]
+                    habitacion.huesped = "Vacío"
+                    break
+                case "2":
+                    habitacion.estado = estados[1]
+                    break
+                case "3":
+                    habitacion.estado = estados[2]
+                    break
+                default:
+                    console.log("Selección no valida...")
+            }
+
+            continue
+        }
+
+        if (habitacion.huesped === "" && habitacion.estado !== "Libre") {
+            let huesped = prompt("Nombre del huésped").trim()
+
+            if (huesped === "") {
+                console.log("Nombre no valido...")
+            } else {
+                habitacion.huesped = huesped
             }
 
             continue
