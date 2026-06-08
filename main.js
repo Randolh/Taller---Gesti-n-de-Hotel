@@ -32,6 +32,7 @@ function mostrarMenu() {
         "6. Salir"
 
     let opcion = prompt(menu)
+    console.clear()
 
     switch (opcion) {
         case "1":
@@ -41,8 +42,7 @@ function mostrarMenu() {
             listarHabitaciones(mostrarMenu)
             break
         case "3":
-            console.log("Buscar")
-            mostrarMenu()
+            buscarHabitacion(mostrarMenu)
             break
         case "4":
             console.log("Cambiar estado")
@@ -207,6 +207,33 @@ function listarHabitaciones(callback) {
     }, 2000)
 
 
+}
+
+
+function buscarHabitacion(callback) {
+    console.log("Buscando habitación por número...")
+    let numero = prompt("Ingresa el número de habitación a buscar").trim()
+
+    if (!validarNumero(numero) || parseInt(numero) <= 0) {
+        console.log("Número no valido...")
+        mostrarMenu()
+        return
+    }
+
+    console.log("Consultando base de datos del hotel...")
+
+    setTimeout(() => {
+        const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
+
+        if (!habitacion) {
+            console.log("Habitación no encontrada...")
+            mostrarMenu()
+            return
+        }
+
+        formatoHabitacion(habitacion)
+        mostrarMenu()
+    }, 2000)
 }
 
 mostrarMenu()
