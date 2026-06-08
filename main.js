@@ -1,4 +1,26 @@
-let habitaciones = []
+let habitaciones = [
+    {
+        numero: 101,
+        tipo: "Sencilla",
+        precioNoche: 100,
+        estado: "Libre",
+        huesped: "Vacío"
+    },
+    {
+        numero: 102,
+        tipo: "Doble",
+        precioNoche: 150,
+        estado: "Ocupada",
+        huesped: "Juan Pérez"
+    },
+    {
+        numero: 103,
+        tipo: "Suite",
+        precioNoche: 200,
+        estado: "Limpieza",
+        huesped: "María García"
+    }
+]
 
 function mostrarMenu() {
     let menu = "======== HOTEL ========\n\n" +
@@ -16,8 +38,7 @@ function mostrarMenu() {
             registrarHabitacion(mostrarMenu)
             break
         case "2":
-            console.log("Listar")
-            mostrarMenu()
+            listarHabitaciones(mostrarMenu)
             break
         case "3":
             console.log("Buscar")
@@ -45,6 +66,7 @@ function mostrarMenu() {
 function validarNumero(valor) {
     return valor.trim() !== '' && isFinite(valor)
 }
+
 
 function formatoHabitacion(habitacion) {
     console.log(`Número: ${habitacion.numero}\nTipo: ${habitacion.tipo}\nPrecio por noche: $${habitacion.precioNoche}\nEstado: ${habitacion.estado}\nHuésped: ${habitacion.huesped}`)
@@ -166,6 +188,25 @@ function registrarHabitacion(callback) {
         formatoHabitacion(habitacion)
         callback()
     }, 2000)
+}
+
+
+function listarHabitaciones(callback) {
+    console.log("Consultando base de datos del hotel...")
+
+    setTimeout(() => {
+        if (habitaciones.length === 0) {
+            console.log("No hay habitaciones registradas...")
+            callback()
+            return
+        }
+
+        console.table(habitaciones)
+
+        callback()
+    }, 2000)
+
+
 }
 
 mostrarMenu()
