@@ -22,7 +22,7 @@ let habitaciones = [
     }
 ]
 
-function mostrarMenu() {
+async function mostrarMenu() {
     let menu = "======== HOTEL ========\n\n" +
         "1. Registrar nueva habiatación\n" +
         "2. Listar Habitaciones\n" +
@@ -36,28 +36,29 @@ function mostrarMenu() {
 
     switch (opcion) {
         case "1":
-            registrarHabitacion(mostrarMenu)
+            await registrarHabitacion()
             break
         case "2":
-            listarHabitaciones(mostrarMenu)
+            await listarHabitaciones()
             break
         case "3":
-            buscarHabitacion(mostrarMenu)
+            await buscarHabitacion()
             break
         case "4":
-            cambiarEstado(mostrarMenu)
+            await cambiarEstado()
             break
         case "5":
-            eliminarHabitacion(mostrarMenu)
+            eliminarHabitacion()
             break
         case "6":
             console.log("Saliendo...")
-            mostrarMenu()
-            break
+            return
         default:
             console.log("Opción no valida...")
-            mostrarMenu()
+            break
     }
+
+    mostrarMenu()
 }
 
 
@@ -71,7 +72,14 @@ function formatoHabitacion(habitacion) {
 }
 
 
-function registrarHabitacion(callback) {
+function simulacionTiempoEspera(tiempo) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, tiempo);
+    })
+}
+
+
+async function registrarHabitacion() {
     console.log("Registrando nueva habitación...")
     const habitacion = {
         numero: "",
@@ -180,35 +188,28 @@ function registrarHabitacion(callback) {
     }
 
     console.log("Creando registro de habitación...")
-    setTimeout(() => {
-        habitaciones.push(habitacion)
-        console.log("Habitación registrada exitosamente...")
-        formatoHabitacion(habitacion)
-        callback()
-    }, 2000)
+    await simulacionTiempoEspera(2000)
+    habitaciones.push(habitacion)
+    console.log("Habitación registrada exitosamente...")
+    formatoHabitacion(habitacion)
 }
 
 
-function listarHabitaciones(callback) {
+async function listarHabitaciones() {
     console.log("Consultando base de datos del hotel...")
 
-    setTimeout(() => {
-        if (habitaciones.length === 0) {
-            console.log("No hay habitaciones registradas...")
-            callback()
-            return
-        }
+    await simulacionTiempoEspera(2000)
 
-        console.table(habitaciones)
+    if (habitaciones.length === 0) {
+        console.log("No hay habitaciones registradas...")
+        return
+    }
 
-        callback()
-    }, 2000)
-
-
+    console.table(habitaciones)
 }
 
 
-function buscarHabitacion(callback) {
+async function buscarHabitacion() {
     console.log("Buscando habitación por número...")
     let numero = prompt("Ingresa el número de habitación a buscar").trim()
 
@@ -220,21 +221,21 @@ function buscarHabitacion(callback) {
 
     console.log("Consultando base de datos del hotel...")
 
-    setTimeout(() => {
-        const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
+    await simulacionTiempoEspera(2000)
 
-        if (!habitacion) {
-            console.log("Habitación no encontrada...")
-            mostrarMenu()
-            return
-        }
+    const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
 
-        formatoHabitacion(habitacion)
+    if (!habitacion) {
+        console.log("Habitación no encontrada...")
         mostrarMenu()
-    }, 2000)
+        return
+    }
+
+    formatoHabitacion(habitacion)
+    mostrarMenu()
 }
 
-function cambiarEstado(callback) {
+async function cambiarEstado() {
     console.log("Cambiar estado de una habitación...")
     let numero = prompt("Ingresa el número de habitación a cambiar su estado").trim()
 
@@ -246,90 +247,84 @@ function cambiarEstado(callback) {
 
     console.log("Consultando base de datos del hotel...")
 
-    setTimeout(() => {
+    await simulacionTiempoEspera(3000)
 
-        let modificado = false
-
-
-        const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
-
-        if (!habitacion) {
-            console.log("Habitación no encontrada...")
-            mostrarMenu()
-            return
-        }
-
-        formatoHabitacion(habitacion)
-
-        const estados = ["Libre", "Ocupada", "Limpieza"]
-
-        let menu = "======== Cambiar estado de la habitación ========\n\n" +
-            "1. Libre\n" +
-            "2. Ocupada\n" +
-            "3. Limpieza\n" +
-            "Ingresa el nuevo estado de la habitación:"
-
-        let seleccion = prompt(menu).trim()
+    let modificado = false
 
 
+    const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
 
-        switch (seleccion) {
-            case "1":
-                habitacion.estado = estados[0]
-                habitacion.huesped = "Vacío"
+    if (!habitacion) {
+        console.log("Habitación no encontrada...")
+        mostrarMenu()
+        return
+    }
+
+    formatoHabitacion(habitacion)
+
+    const estados = ["Libre", "Ocupada", "Limpieza"]
+
+    let menu = "======== Cambiar estado de la habitación ========\n\n" +
+        "1. Libre\n" +
+        "2. Ocupada\n" +
+        "3. Limpieza\n" +
+        "Ingresa el nuevo estado de la habitación:"
+
+    let seleccion = prompt(menu).trim()
+
+
+
+    switch (seleccion) {
+        case "1":
+            habitacion.estado = estados[0]
+            habitacion.huesped = "Vacío"
+            modificado = true
+            break
+        case "2":
+            habitacion.estado = estados[1]
+            let huesped = prompt("Nombre del huésped").trim()
+
+            if (huesped === "") {
+                console.log("Nombre no valido...")
+            } else {
+                habitacion.huesped = huesped
                 modificado = true
-                break
-            case "2":
-                habitacion.estado = estados[1]
-                let huesped = prompt("Nombre del huésped").trim()
+            }
+            break
+        case "3":
+            habitacion.estado = estados[2]
+            let huespedL = prompt("Nombre del huésped").trim()
 
-                if (huesped === "") {
-                    console.log("Nombre no valido...")
-                } else {
-                    habitacion.huesped = huesped
-                    modificado = true
-                }
-                break
-            case "3":
-                habitacion.estado = estados[2]
-                let huespedL = prompt("Nombre del huésped").trim()
+            if (huespedL === "") {
+                console.log("Nombre no valido...")
+            } else {
+                habitacion.huesped = huespedL
+                modificado = true
+            }
+            break
+        default:
+            console.log("Selección no valida...")
+    }
 
-                if (huespedL === "") {
-                    console.log("Nombre no valido...")
-                } else {
-                    habitacion.huesped = huespedL
-                    modificado = true
-                }
-                break
-            default:
-                console.log("Selección no valida...")
-        }
+    if (modificado) {
+        console.log("Actualizando base de datos del hotel...")
 
-        if (modificado) {
-            console.log("Actualizando base de datos del hotel...")
+        await simulacionTiempoEspera(2000)
 
-            setTimeout(() => {
-                console.log("Estado de la habitación actualizado exitosamente...")
-                formatoHabitacion(habitacion)
-                callback()
-            }, 2000)
-        } else {
-            console.log("No se realizaron cambios...")
-            callback()
-        }
-    }, 3000)
-
-
+        console.log("Estado de la habitación actualizado exitosamente...")
+        formatoHabitacion(habitacion)
+    } else {
+        console.log("No se realizaron cambios...")
+    }
 }
 
 
-function eliminarHabitacion(callback) {
+function eliminarHabitacion() {
     console.log("Eliminar habitación...")
     let numero = prompt("Ingresa el número de habitación a eliminar").trim()
 
     if (!validarNumero(numero) || parseInt(numero) <= 0) {
         console.log("Número no valido...")
-        mostrarMenu()
         return
     }
 
@@ -339,13 +334,11 @@ function eliminarHabitacion(callback) {
 
     if (index === -1) {
         console.log("Habitación no encontrada...")
-        mostrarMenu()
         return
     }
 
     habitaciones.splice(index, 1)
     console.log("Habitación eliminada exitosamente...")
-    mostrarMenu()
 }
 
 mostrarMenu()
