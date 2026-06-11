@@ -22,55 +22,86 @@ let habitaciones = [
     }
 ]
 
+const consola = document.getElementById("consola")
+
+function esperarVista(){
+    return simulacionTiempoEspera(500);
+}
+
+function imprimir(texto){
+    limpiarConsola()
+    const p = document.createElement("p")
+    p.classList.add("impresion")
+    p.textContent = texto
+    consola.appendChild(p)
+}
+
+function limpiarConsola(){
+    consola.replaceChildren()
+}
+
 async function mostrarMenu() {
     let menu = "======== HOTEL ========\n\n" +
-        "1. Registrar nueva habiatación\n" +
+        "1. Registrar nueva habitación\n" +
         "2. Listar Habitaciones\n" +
         "3. Buscar habitación por número\n" +
         "4. Cambiar estado de una habitación\n" +
         "5. Eliminar Habitación\n" +
         "6. Salir"
 
-    let opcion = prompt(menu)
-    console.clear()
+    await esperarVista()
+    let opcion = promptMod(menu)
 
     switch (opcion) {
         case "1":
+            limpiarConsola()
             await registrarHabitacion()
             break
         case "2":
+            limpiarConsola()
             await listarHabitaciones()
             break
         case "3":
+            limpiarConsola()
             await buscarHabitacion()
             break
         case "4":
+            limpiarConsola()
             await cambiarEstado()
             break
         case "5":
-            eliminarHabitacion()
+            limpiarConsola()
+            await eliminarHabitacion()
             break
         case "6":
-            console.log("Saliendo...")
+            limpiarConsola()
+            imprimir("Saliendo...")
             return
         default:
-            console.log("Opción no valida...")
+            limpiarConsola()
+            imprimir("Opción no valida...")
             break
     }
 
     mostrarMenu()
 }
 
-
 function validarNumero(valor) {
-    return valor.trim() !== '' && isFinite(valor)
+    return valor !== null && valor.trim() !== '' && isFinite(valor)
 }
-
 
 function formatoHabitacion(habitacion) {
-    console.log(`Número: ${habitacion.numero}\nTipo: ${habitacion.tipo}\nPrecio por noche: $${habitacion.precioNoche}\nEstado: ${habitacion.estado}\nHuésped: ${habitacion.huesped}`)
+    let texto = `Número: ${habitacion.numero}\nTipo: ${habitacion.tipo}\nPrecio por noche: $${habitacion.precioNoche}\nEstado: ${habitacion.estado}\nHuésped: ${habitacion.huesped}\n`
+    const p = document.createElement("p")
+    p.classList.add("impresion")
+    p.textContent = texto
+    consola.appendChild(p)
 }
 
+function promptMod(texto) {
+    limpiarConsola()
+    return prompt(texto)
+}
 
 function simulacionTiempoEspera(tiempo) {
     return new Promise(function (resolve) {
@@ -78,9 +109,8 @@ function simulacionTiempoEspera(tiempo) {
     })
 }
 
-
 async function registrarHabitacion() {
-    console.log("Registrando nueva habitación...")
+    imprimir("Registrando nueva habitación...")
     const habitacion = {
         numero: "",
         tipo: "",
@@ -92,10 +122,15 @@ async function registrarHabitacion() {
     while (true) {
 
         if (habitacion.numero === "") {
-            let no = prompt("Número de habitación").trim()
+            await esperarVista()
+            let no = promptMod("Número de habitación")
+            if (no === null) return;
+            no = no.trim()
 
             if (!validarNumero(no) || parseInt(no) <= 0) {
-                console.log("Número no valido...")
+                imprimir("Número no valido...")
+            } else if (habitaciones.some(h => h.numero === parseInt(no))) {
+                imprimir("Ese número de habitación ya está registrado...")
             } else {
                 habitacion.numero = parseInt(no)
             }
@@ -112,7 +147,10 @@ async function registrarHabitacion() {
                 "3. Suite\n" +
                 "Ingresa el tipo de habitación:"
 
-            let seleccion = prompt(menu).trim()
+            await esperarVista()
+            let seleccion = promptMod(menu)
+            if (seleccion === null) return;
+            seleccion = seleccion.trim()
 
             switch (seleccion) {
                 case "1":
@@ -125,17 +163,20 @@ async function registrarHabitacion() {
                     habitacion.tipo = tipos[2]
                     break
                 default:
-                    console.log("Selección no valida...")
+                    imprimir("Selección no valida...")
             }
-
+            
             continue
         }
 
         if (habitacion.precioNoche === 0) {
-            let precio = prompt("Precio por noche").trim()
+            await esperarVista()
+            let precio = promptMod("Precio por noche")
+            if (precio === null) return;
+            precio = precio.trim()
 
-            if (!validarNumero(precio) && parseFloat(precio) > 0) {
-                console.log("Precio no valido...")
+            if (!validarNumero(precio) || parseFloat(precio) <= 0) {
+                imprimir("Precio no valido...")
             } else {
                 habitacion.precioNoche = parseFloat(precio)
             }
@@ -152,7 +193,10 @@ async function registrarHabitacion() {
                 "3. Limpieza\n" +
                 "Ingresa el estado de la habitación:"
 
-            let seleccion = prompt(menu).trim()
+            await esperarVista()
+            let seleccion = promptMod(menu)
+            if (seleccion === null) return;
+            seleccion = seleccion.trim()
 
             switch (seleccion) {
                 case "1":
@@ -166,100 +210,103 @@ async function registrarHabitacion() {
                     habitacion.estado = estados[2]
                     break
                 default:
-                    console.log("Selección no valida...")
+                    imprimir("Selección no valida...")
             }
 
             continue
         }
 
         if (habitacion.huesped === "" && habitacion.estado !== "Libre") {
-            let huesped = prompt("Nombre del huésped").trim()
+            await esperarVista()
+            let huesped = promptMod("Nombre del huésped")
+            if (huesped === null) return;
+            huesped = huesped.trim()
 
             if (huesped === "") {
-                console.log("Nombre no valido...")
+                imprimir("Nombre no valido...")
             } else {
                 habitacion.huesped = huesped
             }
 
             continue
         }
-
+        
         break
     }
 
-    console.log("Creando registro de habitación...")
+    imprimir("Creando registro de habitación...")
     await simulacionTiempoEspera(2000)
     habitaciones.push(habitacion)
-    console.log("Habitación registrada exitosamente...")
+    imprimir("Habitación registrada exitosamente...")
     formatoHabitacion(habitacion)
 }
 
-
 async function listarHabitaciones() {
-    console.log("Consultando base de datos del hotel...")
+    imprimir("Consultando base de datos del hotel...")
 
     await simulacionTiempoEspera(2000)
-
+    limpiarConsola()
     if (habitaciones.length === 0) {
-        console.log("No hay habitaciones registradas...")
+        imprimir("No hay habitaciones registradas...")
         return
     }
 
-    console.table(habitaciones)
+    habitaciones.forEach(h => formatoHabitacion(h))
 }
 
-
 async function buscarHabitacion() {
-    console.log("Buscando habitación por número...")
-    let numero = prompt("Ingresa el número de habitación a buscar").trim()
+    imprimir("Buscando habitación por número...")
+    await esperarVista()
+    let numero = promptMod("Ingresa el número de habitación a buscar")
+    if (numero === null) return;
+    numero = numero.trim()
 
     if (!validarNumero(numero) || parseInt(numero) <= 0) {
-        console.log("Número no valido...")
-        mostrarMenu()
+        imprimir("Número no valido...")
         return
     }
 
-    console.log("Consultando base de datos del hotel...")
+    imprimir("Consultando base de datos del hotel...")
 
     await simulacionTiempoEspera(2000)
 
     const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
 
     if (!habitacion) {
-        console.log("Habitación no encontrada...")
-        mostrarMenu()
+        imprimir("Habitación no encontrada...")
         return
     }
 
+    limpiarConsola()
     formatoHabitacion(habitacion)
-    mostrarMenu()
 }
 
 async function cambiarEstado() {
-    console.log("Cambiar estado de una habitación...")
-    let numero = prompt("Ingresa el número de habitación a cambiar su estado").trim()
+    imprimir("Cambiar estado de una habitación...")
+    await esperarVista()
+    let numero = promptMod("Ingresa el número de habitación a cambiar su estado")
+    if (numero === null) return;
+    numero = numero.trim()
 
     if (!validarNumero(numero) || parseInt(numero) <= 0) {
-        console.log("Número no valido...")
-        mostrarMenu()
+        imprimir("Número no valido...")
         return
     }
 
-    console.log("Consultando base de datos del hotel...")
+    imprimir("Consultando base de datos del hotel...")
 
     await simulacionTiempoEspera(3000)
 
     let modificado = false
 
-
     const habitacion = habitaciones.find(h => h.numero === parseInt(numero))
 
     if (!habitacion) {
-        console.log("Habitación no encontrada...")
-        mostrarMenu()
+        imprimir("Habitación no encontrada...")
         return
     }
 
+    limpiarConsola()
     formatoHabitacion(habitacion)
 
     const estados = ["Libre", "Ocupada", "Limpieza"]
@@ -270,9 +317,10 @@ async function cambiarEstado() {
         "3. Limpieza\n" +
         "Ingresa el nuevo estado de la habitación:"
 
-    let seleccion = prompt(menu).trim()
-
-
+    await esperarVista()
+    let seleccion = promptMod(menu)
+    if (seleccion === null) return;
+    seleccion = seleccion.trim()
 
     switch (seleccion) {
         case "1":
@@ -282,10 +330,12 @@ async function cambiarEstado() {
             break
         case "2":
             habitacion.estado = estados[1]
-            let huesped = prompt("Nombre del huésped").trim()
+            await esperarVista()
+            let huesped = promptMod("Nombre del huésped")
+            if (huesped !== null) huesped = huesped.trim()
 
-            if (huesped === "") {
-                console.log("Nombre no valido...")
+            if (!huesped || huesped === "") {
+                imprimir("Nombre no valido...")
             } else {
                 habitacion.huesped = huesped
                 modificado = true
@@ -293,52 +343,56 @@ async function cambiarEstado() {
             break
         case "3":
             habitacion.estado = estados[2]
-            let huespedL = prompt("Nombre del huésped").trim()
+            await esperarVista()
+            let huespedL = promptMod("Nombre del huésped")
+            if (huespedL !== null) huespedL = huespedL.trim()
 
-            if (huespedL === "") {
-                console.log("Nombre no valido...")
+            if (!huespedL || huespedL === "") {
+                imprimir("Nombre no valido...")
             } else {
                 habitacion.huesped = huespedL
                 modificado = true
             }
             break
         default:
-            console.log("Selección no valida...")
+            imprimir("Selección no valida...")
     }
 
     if (modificado) {
-        console.log("Actualizando base de datos del hotel...")
+        imprimir("Actualizando base de datos del hotel...")
 
         await simulacionTiempoEspera(2000)
 
-        console.log("Estado de la habitación actualizado exitosamente...")
+        imprimir("Estado de la habitación actualizado exitosamente...")
         formatoHabitacion(habitacion)
     } else {
-        console.log("No se realizaron cambios...")
+        imprimir("No se realizaron cambios...")
     }
 }
 
-
-function eliminarHabitacion() {
-    console.log("Eliminar habitación...")
-    let numero = prompt("Ingresa el número de habitación a eliminar").trim()
+async function eliminarHabitacion() {
+    imprimir("Eliminar habitación...")
+    await esperarVista()
+    let numero = promptMod("Ingresa el número de habitación a eliminar")
+    if (numero === null) return;
+    numero = numero.trim()
 
     if (!validarNumero(numero) || parseInt(numero) <= 0) {
-        console.log("Número no valido...")
+        imprimir("Número no valido...")
         return
     }
 
-    console.log("Consultando base de datos del hotel...")
+    imprimir("Consultando base de datos del hotel...")
 
     const index = habitaciones.findIndex(h => h.numero === parseInt(numero))
 
     if (index === -1) {
-        console.log("Habitación no encontrada...")
+        imprimir("Habitación no encontrada...")
         return
     }
 
     habitaciones.splice(index, 1)
-    console.log("Habitación eliminada exitosamente...")
+    imprimir("Habitación eliminada exitosamente...")
 }
 
 mostrarMenu()
